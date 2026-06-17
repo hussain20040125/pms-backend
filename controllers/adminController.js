@@ -212,6 +212,7 @@ exports.getInspection = asyncHandler(async (req, res) => {
     .populate('projectId')
     .populate('floorId')
     .populate('locationId')
+    .populate('elementId', 'name type')
     .populate('tradeId')
     .populate('results.checkPointId');
   if (!inspection) return res.status(404).json({ message: 'Inspection not found.' });
