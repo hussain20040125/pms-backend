@@ -3,8 +3,8 @@ const Trade = require('../models/Trade');
 
 exports.getAll = asyncHandler(async (req, res) => {
   const query = req.query.elementId
-    ? { elementId: req.query.elementId }
-    : { $or: [{ elementId: null }, { elementId: { $exists: false } }] };
+    ? { elementId: req.query.elementId, isHidden: { $ne: true } }
+    : { $or: [{ elementId: null }, { elementId: { $exists: false } }], isHidden: { $ne: true } };
   res.json(await Trade.find(query).sort({ order: 1 }).lean());
 });
 

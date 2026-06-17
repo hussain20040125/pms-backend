@@ -1,13 +1,16 @@
 const asyncHandler = require('../middleware/asyncHandler');
 const Inspection = require('../models/Inspection');
 
-exports.getAll = asyncHandler(async (_req, res) => {
-  res.json(await Inspection.find()
+exports.getAll = asyncHandler(async (req, res) => {
+  const query = {};
+  if (req.query.locationId) query.locationId = req.query.locationId;
+  if (req.query.tradeId)    query.tradeId    = req.query.tradeId;
+  res.json(await Inspection.find(query)
     .populate('projectId', 'name')
     .populate('floorId', 'code label')
     .populate('locationId', 'name')
     .populate('tradeId', 'name')
-    .sort({ createdAt: -1 })
+    .sort({ dateOfCheck: -1 })
     .lean());
 });
 

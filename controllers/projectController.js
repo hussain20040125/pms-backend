@@ -2,7 +2,7 @@ const asyncHandler = require('../middleware/asyncHandler');
 const Project = require('../models/Project');
 
 exports.getAll = asyncHandler(async (_req, res) => {
-  res.json(await Project.find().sort({ type: 1, name: 1 }).lean());
+  res.json(await Project.find({ isHidden: { $ne: true } }).sort({ type: 1, name: 1 }).lean());
 });
 
 exports.getOne = asyncHandler(async (req, res) => {

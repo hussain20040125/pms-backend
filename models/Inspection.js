@@ -14,14 +14,10 @@ const inspectionSchema = new mongoose.Schema({
   elementId:  { type: mongoose.Schema.Types.ObjectId, ref: 'Element' },
   tradeId: { type: mongoose.Schema.Types.ObjectId, ref: 'Trade', required: true },
   dateOfCheck: { type: Date, default: Date.now },
+  workNotes: String,
   contractorAgency: String,
   checkedBy: String,
   results: [resultSchema],
-  signatures: {
-    siteEngineer: String,
-    contractorRep: String,
-    projectManager: String,
-  },
   status: { type: String, enum: ['DRAFT', 'SUBMITTED'], default: 'DRAFT' },
 }, { timestamps: true });
 
