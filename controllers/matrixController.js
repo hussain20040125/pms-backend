@@ -98,14 +98,28 @@ exports.getMatrix = asyncHandler(async (req, res) => {
   if (projectId) inspQuery.projectId = projectId;
   const inspections = await Inspection.find(inspQuery).lean();
 
-  // Index inspections by `locId:tradeId`
+  // Index inspections by `locId:tradeId`, keeping only the most recent per wall element
   const inspByCell = {};
-  inspections.forEach(ins => {
+  // Sort newest-first so the first encountered per wall is the latest
+  const sortedInspections = [...inspections].sort((a, b) =>
+    new Date(b.submittedAt || b.createdAt) - new Date(a.submittedAt || a.createdAt)
+  );
+  sortedInspections.forEach(ins => {
     const lid = String(ins.locationId);
     const tid = String(ins.tradeId);
     const key = `${lid}:${tid}`;
     if (!inspByCell[key]) inspByCell[key] = [];
-    inspByCell[key].push(ins);
+
+    // For wall-level inspections, keep only the latest per elementId
+    if (ins.elementId) {
+      const eid = String(ins.elementId);
+      const alreadyHasWall = inspByCell[key].some(
+        ex => ex.elementId && String(ex.elementId) === eid
+      );
+      if (!alreadyHasWall) inspByCell[key].push(ins);
+    } else {
+      inspByCell[key].push(ins);
+    }
   });
 
   // 6. Checkpoints per trade
