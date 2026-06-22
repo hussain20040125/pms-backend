@@ -218,9 +218,12 @@ exports.getMatrix = asyncHandler(async (req, res) => {
       name: t.name,
       order: t.order,
       isRecurring: t.isRecurring || false,
+      isHoldPoint: t.isHoldPoint || false,
+      isPending: t.isPending || false,
+      color: t.color || '',
       checkpoints: (cpsByTrade[String(t._id)] || [])
         .slice().sort((a, b) => (a.order || 0) - (b.order || 0))
-        .map(cp => ({ _id: cp._id, title: cp.title, order: cp.order })),
+        .map(cp => ({ _id: cp._id, title: cp.title, order: cp.order, photoRequired: cp.photoRequired || false })),
     })),
     rooms: resultRows,
   });

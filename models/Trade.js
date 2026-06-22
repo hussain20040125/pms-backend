@@ -8,6 +8,7 @@ const tradeSchema = new mongoose.Schema({
   isHidden:     { type: Boolean, default: false },
   isRecurring:  { type: Boolean, default: false },
   order:        { type: Number, default: 0 },
+  color:        { type: String, default: '' },
   elementId:    { type: mongoose.Schema.Types.ObjectId, ref: 'Element', default: null },
 }, { timestamps: true });
 
