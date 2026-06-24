@@ -175,7 +175,10 @@ exports.deleteTrade = asyncHandler(async (req, res) => {
 
 // ── CheckPoints ───────────────────────────────────────────────────────────────
 exports.getCheckPoints = asyncHandler(async (req, res) => {
-  const query = req.query.tradeId ? { tradeId: req.query.tradeId } : {};
+  const query = {};
+  if (req.query.tradeId)   query.tradeId   = req.query.tradeId;
+  if (req.query.projectId) query.projectId = req.query.projectId;
+  else                     query.projectId = null; // default: show global checkpoints
   res.json(await CheckPoint.find(query).populate('tradeId', 'name').sort({ order: 1 }).lean());
 });
 

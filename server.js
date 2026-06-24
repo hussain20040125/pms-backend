@@ -1,4 +1,4 @@
-const express = require('express');
+﻿const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const compression = require('compression');
@@ -7,11 +7,11 @@ const mongoSanitize = require('express-mongo-sanitize');
 const rateLimit = require('express-rate-limit');
 const dotenv = require('dotenv');
 const path = require('path');
-const connectDB = require('./config/db');
+const connectDB = require('./src/config/db');
 
 dotenv.config();
 
-// ── Validate required env vars ────────────────────────────────────────────────
+// â”€â”€ Validate required env vars â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const REQUIRED_ENV = ['MONGO_URI', 'JWT_SECRET'];
 const missing = REQUIRED_ENV.filter(k => !process.env[k]);
 if (missing.length) {
@@ -21,18 +21,18 @@ if (missing.length) {
 
 const isProd = process.env.NODE_ENV === 'production';
 
-connectDB().then(() => require('./utils/seedRoles')());
+connectDB().then(() => require('./src/utils/seedRoles')());
 
 const app = express();
 
 app.set('trust proxy', 1);
 
-// ── Security headers ──────────────────────────────────────────────────────────
+// â”€â”€ Security headers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
 
-// ── CORS ──────────────────────────────────────────────────────────────────────
+// â”€â”€ CORS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // FRONTEND_URL can be comma-separated: "http://localhost:5173,https://app.vercel.app"
-// cors `origin` must be a function — passing the raw string sends ALL values in one
+// cors `origin` must be a function â€” passing the raw string sends ALL values in one
 // header which browsers reject (Access-Control-Allow-Origin only allows one value).
 const allowedOrigins = (process.env.FRONTEND_URL || 'https://checklist-backend-1-6g7s.onrender.com')
   .split(',').map(o => o.trim().replace(/\/$/, ''));
@@ -46,18 +46,18 @@ app.use(cors({
   credentials: true,
 }));
 
-// ── Compression + logging ─────────────────────────────────────────────────────
+// â”€â”€ Compression + logging â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 app.use(compression());
 app.use(morgan(isProd ? 'combined' : 'dev'));
 
-// ── Body parsing ──────────────────────────────────────────────────────────────
+// â”€â”€ Body parsing â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 app.use(express.json({ limit: '2mb' }));
 app.use(express.urlencoded({ extended: true, limit: '2mb' }));
 
-// ── NoSQL injection sanitization ──────────────────────────────────────────────
+// â”€â”€ NoSQL injection sanitization â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 app.use(mongoSanitize());
 
-// ── Rate limits ───────────────────────────────────────────────────────────────
+// â”€â”€ Rate limits â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const apiLimiter = rateLimit({
   windowMs: 60 * 1000,
   max: 300,
@@ -66,42 +66,42 @@ const apiLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-// ── Static uploads ────────────────────────────────────────────────────────────
+// â”€â”€ Static uploads â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// ── Health check (also handles GET / for hosting-platform probes) ─────────────
+// â”€â”€ Health check (also handles GET / for hosting-platform probes) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 app.get(['/', '/health'], (_req, res) => res.json({ status: 'ok', app: 'Neoteric QC API', env: process.env.NODE_ENV || 'development' }));
 
-// ── API routes ────────────────────────────────────────────────────────────────
-app.use('/api/auth', require('./routes/auth'));
-app.use('/api/projects', apiLimiter, require('./routes/projects'));
-app.use('/api/floors', apiLimiter, require('./routes/floors'));
-app.use('/api/locations', apiLimiter, require('./routes/locations'));
-app.use('/api/elements',       apiLimiter, require('./routes/elements'));
-app.use('/api/trade-elements', apiLimiter, require('./routes/tradeElements'));
-app.use('/api/trades', apiLimiter, require('./routes/trades'));
-app.use('/api/checkpoints', apiLimiter, require('./routes/checkpoints'));
-app.use('/api/inspections', apiLimiter, require('./routes/inspections'));
-app.use('/api/uploads', apiLimiter, require('./routes/uploads'));
+// â”€â”€ API routes â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+app.use('/api/auth', require('./src/routes/auth'));
+app.use('/api/projects', apiLimiter, require('./src/routes/projects'));
+app.use('/api/floors', apiLimiter, require('./src/routes/floors'));
+app.use('/api/locations', apiLimiter, require('./src/routes/locations'));
+app.use('/api/elements',       apiLimiter, require('./src/routes/elements'));
+app.use('/api/trade-elements', apiLimiter, require('./src/routes/tradeElements'));
+app.use('/api/trades', apiLimiter, require('./src/routes/trades'));
+app.use('/api/checkpoints', apiLimiter, require('./src/routes/checkpoints'));
+app.use('/api/inspections', apiLimiter, require('./src/routes/inspections'));
+app.use('/api/uploads', apiLimiter, require('./src/routes/uploads'));
 
-const authMiddleware = require('./middleware/auth');
-app.use('/api/admin', authMiddleware, require('./routes/admin'));
+const authMiddleware = require('./src/middleware/auth');
+app.use('/api/admin', authMiddleware, require('./src/routes/admin'));
 
-// ── 404 ───────────────────────────────────────────────────────────────────────
+// â”€â”€ 404 â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 app.use((_req, res) => res.status(404).json({ message: 'Route not found.' }));
 
-// ── Global error handler ──────────────────────────────────────────────────────
-app.use(require('./middleware/errorHandler'));
+// â”€â”€ Global error handler â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+app.use(require('./src/middleware/errorHandler'));
 
-// ── Server ────────────────────────────────────────────────────────────────────
+// â”€â”€ Server â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const PORT = parseInt(process.env.PORT || '5000', 10);
 const server = app.listen(PORT, () =>
   console.log(`[SERVER] Running on port ${PORT} (${process.env.NODE_ENV || 'development'})`)
 );
 
-// ── Graceful shutdown ─────────────────────────────────────────────────────────
+// â”€â”€ Graceful shutdown â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const shutdown = (signal) => {
-  console.log(`[SERVER] ${signal} received — shutting down`);
+  console.log(`[SERVER] ${signal} received â€” shutting down`);
   server.close(() => {
     console.log('[SERVER] HTTP server closed');
     process.exit(0);
@@ -113,3 +113,4 @@ process.on('SIGTERM', () => shutdown('SIGTERM'));
 process.on('SIGINT', () => shutdown('SIGINT'));
 process.on('unhandledRejection', (err) => { console.error('[UNHANDLED REJECTION]', err); shutdown('unhandledRejection'); });
 process.on('uncaughtException', (err) => { console.error('[UNCAUGHT EXCEPTION]', err); shutdown('uncaughtException'); });
+
