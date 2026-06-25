@@ -6,6 +6,7 @@ const projectSchema = new mongoose.Schema({
   description: String,
   mapImage:    String,
   isHidden:    { type: Boolean, default: false },
+  disabledTrades: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Trade' }],
   maps: [{
     name: { type: String, required: true },
     url: { type: String, required: true }
